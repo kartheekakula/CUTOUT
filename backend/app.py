@@ -15,7 +15,7 @@ async def remove_bg(file: UploadFile = File(...)):
     input_bytes = await file.read()
 
     input_image = Image.open(io.BytesIO(input_bytes)).convert("RGBA")
-    output_image = remove(input_image)
+    output_image = remove(input_image, model_name="u2netp")
 
     buf = io.BytesIO()
     output_image.save(buf, format="PNG")
