@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
@@ -8,93 +7,57 @@
 
   <title>CUTOUT</title>
 
-  <!-- FONTS -->
-
   <link href="https://api.fontshare.com/v2/css?f[]=clash-display@700,600&f[]=general-sans@400,500&display=swap" rel="stylesheet">
-
-  <!-- CSS -->
-
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
 
-<!-- HERO -->
-
 <section class="hero">
-
-  <!-- LEFT -->
 
   <div class="hero-left">
     <h1 class="title">CUTOUT</h1>
     <p class="subtitle">Remove backgrounds in seconds</p>
 
-```
-<div class="upload-box" onclick="document.getElementById('fileInput').click()">
-  <p>DROP IMAGE OR CLICK</p>
-  <input type="file" id="fileInput" hidden>
-</div>
+    <!-- ✅ FIXED UPLOAD -->
+    <div class="upload-box" id="uploadBox">
+      <p>DROP IMAGE OR CLICK</p>
+    </div>
 
-<div class="options">
-  <button class="opt-btn">BLACK</button>
-  <button class="opt-btn">WHITE</button>
-  <button class="opt-btn">TRANSPARENT</button>
-</div>
-```
+    <!-- ✅ KEEP INPUT OUTSIDE -->
+    <input type="file" id="fileInput" hidden>
 
+    <div class="options">
+      <button class="opt-btn">BLACK</button>
+      <button class="opt-btn">WHITE</button>
+      <button class="opt-btn">TRANSPARENT</button>
+    </div>
   </div>
-
-  <!-- RIGHT -->
 
   <div class="hero-right">
     <h2>Built by Kartheek</h2>
     <p>
-      Hey, Kartheek Akula here. Like most Indian kids, I spent two years grinding for JEE 
-      just to land in a private university and realize I’m not actually interested in computer science.
-
-
-  So what now… drop out? Not really. But I can choose a different path, a creative one.
-
-  CUTOUT came from that space. It’s a small attempt to solve a real problem in the creative process,
-  while also experimenting with building things on the web.
-
-  Honestly, making websites isn’t always fun but figuring things out and creating something useful is.
-
-  Maybe you’ll see me build more tools, maybe films, maybe something unexpected.
-  For now, try CUTOUT and if you like it, drop a message on my Instagram.
-</p>
-```
-
+      Hey, Kartheek Akula here...
+    </p>
   </div>
 
 </section>
-
-<!-- PREVIEW -->
 
 <section class="preview">
   <div class="card" id="original">Original</div>
   <div class="card" id="result">Result</div>
 </section>
 
-<!-- DOWNLOAD -->
-
 <section class="download">
   <button id="downloadBtn">DOWNLOAD IMAGE</button>
 </section>
-
-<!-- FOOTER -->
 
 <footer class="footer">
   <p class="footer-text">Liked CUTOUT? Let’s connect 👇</p>
 
   <div class="socials">
-    <a href="https://www.instagram.com/kartheekakulaa/" target="_blank" rel="noopener noreferrer">
-      Instagram
-    </a>
-
-    <a href="https://www.linkedin.com/in/kartheek-akula-648082322/" target="_blank" rel="noopener noreferrer">
-      LinkedIn
-    </a>
+    <a href="https://www.instagram.com/kartheekakulaa/" target="_blank">Instagram</a>
+    <a href="https://www.linkedin.com/in/kartheek-akula-648082322/" target="_blank">LinkedIn</a>
   </div>
 </footer>
 
