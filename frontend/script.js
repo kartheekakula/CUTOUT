@@ -1,83 +1,60 @@
-const fileInput = document.getElementById("fileInput");
-const originalCard = document.getElementById("original");
-const resultCard = document.getElementById("result");
-const downloadBtn = document.getElementById("downloadBtn");
+try {
+    const response = await fetch("https://cutout.onrender.com/remove-bg", {
+        method: "POST",
+        body: formData
+    });
 
-let resultImageURL = "";
-
-// HANDLE FILE UPLOAD
-fileInput.addEventListener("change", async () => {
-    const file = fileInput.files[0];
-    if (!file) return;
-
-    // SHOW ORIGINAL IMAGE
-    const reader = new FileReader();
-    reader.onload = () => {
-        originalCard.innerHTML = `<img src="${reader.result}">`;
-    };
-    reader.readAsDataURL(file);
-
-    // LOADING STATE (better UI)
-    resultCard.innerHTML = `
-        <div style="text-align:center;">
-            <p style="opacity:0.7;">Processing...</p>
-        </div>
-    `;
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-        const response = await fetch("http://127.0.0.1:8000/remove-bg", {
-            method: "POST",
-            body: formData
-        });
-
-        const blob = await response.blob();
-        resultImageURL = URL.createObjectURL(blob);
-
-        // SHOW RESULT
-        resultCard.innerHTML = `<img src="${resultImageURL}">`;
-
-    } catch (error) {
-        console.error(error);
-        resultCard.innerHTML = "Something went wrong";
-    }
-});
-
-
-// DOWNLOAD BUTTON
-downloadBtn.addEventListener("click", () => {
-    if (!resultImageURL) {
-        alert("Upload an image first");
+    // 🔥 SAFER ERROR HANDLING
+    if (!response.ok) {
+        const text = await response.text(); // don't assume JSON
+        resultCard.classList.remove("loading");
+        resultCard.innerHTML = `
+            <div style="text-align:center;">
+                <p style="color:#ff6b6b;">Error from server</p>
+                <small style="opacity:0.6;">${text}</small>
+            </div>
+        `;
         return;
     }
 
-    const a = document.createElement("a");
-    a.href = resultImageURL;
-    a.download = "cutout.png";
-    a.click();
-});
+    // 🔥 CHECK RESPONSE TYPE
+    const contentType = response.headers.get("content-type");
 
+    if (!contentType || !contentType.includes("image")) {
+        const text = await response.text();
+        resultCard.classList.remove("loading");
+        resultCard.innerHTML = `
+            <div style="text-align:center;">
+                <p style="color:#ff6b6b;">Invalid response</p>
+                <small style="opacity:0.6;">${text}</small>
+            </div>
+        `;
+        return;
+    }
 
-// DRAG & DROP SUPPORT 🔥
-const uploadBox = document.querySelector(".upload-box");
+    // ✅ SUCCESS
+    const blob = await response.blob();
 
-uploadBox.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    uploadBox.style.borderColor = "#b6ff3c";
-});
+    if (blob.size === 0) {
+        throw new Error("Empty response");
+    }
 
-uploadBox.addEventListener("dragleave", () => {
-    uploadBox.style.borderColor = "#444";
-});
+    resultImageURL = URL.createObjectURL(blob);
 
-uploadBox.addEventListener("drop", (e) => {
-    e.preventDefault();
+    resultCard.innerHTML = `<img src="${resultImageURL}">`;
+    resultCard.classList.remove("loading");
 
-    const file = e.dataTransfer.files[0];
-    if (!file) return;
+} catch (error) {
+    console.error(error);
 
-    fileInput.files = e.dataTransfer.files;
-    fileInput.dispatchEvent(new Event("change"));
-});
+    resultCard.classList.remove("loading");
+
+    resultCard.innerHTML = `
+        <div style="text-align:center;">
+            <p style="color:#ff6b6b;">Server not responding</p>
+            <small style="opacity:0.6;">
+                Render might be sleeping 😴 or API failed
+            </small>
+        </div>
+    `;
+}
