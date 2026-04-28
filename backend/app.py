@@ -1,24 +1,28 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import StreamingResponse
-from rembg import remove
-from PIL import Image
+import requests
 import io
 
 app = FastAPI()
 
+API_KEY = "hhuz9aTEMZbrEbBQvC3BFRdK"
+
 @app.get("/")
 def home():
-    return {"status": "running"}
+    return {"status": "CUTOUT API running"}
 
 @app.post("/remove-bg")
 async def remove_bg(file: UploadFile = File(...)):
-    input_bytes = await file.read()
+    image_bytes = await file.read()
 
-    input_image = Image.open(io.BytesIO(input_bytes)).convert("RGBA")
-    output_image = remove(input_image, model_name="u2netp")
+    response = requests.post(
+        "https://api.remove.bg/v1.0/removebg",
+        files={"image_file": image_bytes},
+        data={"size": "auto"},
+        headers={"X-Api-Key": API_KEY},
+    )
 
-    buf = io.BytesIO()
-    output_image.save(buf, format="PNG")
-    buf.seek(0)
-
-    return StreamingResponse(buf, media_type="image/png")
+    return StreamingResponse(
+        io.BytesIO(response.content),
+        media_type="image/png"
+    )
