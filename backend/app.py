@@ -1,33 +1,43 @@
+from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi.responses import FileResponse
+import subprocess
+import uuid
 import os
-os.environ["OMP_NUM_THREADS"] = "1"
-from fastapi import FastAPI, UploadFile, File
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
-from rembg import remove
-from PIL import Image
-import io
 
 app = FastAPI()
 
-# allow frontend to talk to backend
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,    
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+@app.get("/")
+def home():
+    return {"status": "running"}
 
 @app.post("/remove-bg")
 async def remove_bg(file: UploadFile = File(...)):
-    image = Image.open(file.file).convert("RGBA")
-    output = remove(image)
+    input_path = f"input_{uuid.uuid4()}.png"
+    output_path = f"output_{uuid.uuid4()}.png"
 
-    buf = io.BytesIO()
-    output.save(buf, format="PNG")
-    buf.seek(0)
+    try:
+        # Save file
+        with open(input_path, "wb") as f:
+            f.write(await file.read())
 
-    return StreamingResponse(buf, media_type="image/png")
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("app:app", host="0.0.0.0", port=10000)
+        # Run rembg
+        result = subprocess.run(
+            ["rembg", "i", input_path, output_path],
+            capture_output=True,
+            text=True
+        )
+
+        # Check if failed
+        if result.returncode != 0:
+            raise HTTPException(status_code=500, detail=result.stderr)
+
+        # Check output exists
+        if not os.path.exists(output_path):
+            raise HTTPException(status_code=500, detail="Output not generated")
+
+        return FileResponse(output_path, media_type="image/png")
+
+    finally:
+        # Cleanup (important)
+        if os.path.exists(input_path):
+            os.remove(input_path)
